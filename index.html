@@ -33,7 +33,7 @@
                 Asistente de Investigación TCCR
             </h1>
             <p class="text-lg text-gray-600">
-                Diseño metodológico basado en la Teoría Cognosistémica de la Construcción Relacional Psicosocial Humana (TCCR).
+                Diseño metodológico basado en la Teoría Cognosistémica de la Construcción Relacional Psicosocial Humana (TCCR), bajo las Reglas de Oro Conceptuales.
             </p>
         </header>
 
@@ -134,7 +134,10 @@
 
         // --- Lógica de Generación TCCR ---
         
-        const API_KEY = "AIzaSyDcSrf5qmddi3G3YdqmaQozqCzf8won3iA"; 
+        // ATENCIÓN: Esta clave se completa automáticamente en el entorno de desarrollo (Canvas).
+        // Si despliega esta aplicación externamente (ej: GitHub Pages), DEBE obtener y colocar
+        // su propia clave Gemini API aquí para que la generación funcione.
+        const API_KEY = ""; // Reemplazar con su clave Gemini API si se usa externamente
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
 
         const form = document.getElementById('research-form');
@@ -151,14 +154,28 @@
         const systemPrompt = `
             Eres un experto en la "Teoría Cognosistémica de la Construcción Relacional Psicosocial Humana" (TCCR) de Jalin Simunovic (2025). 
             Tu tarea es generar TRES (3) propuestas de investigación empírica académicamente rigurosas (nivel posgrado) para el tema y la hipótesis proporcionados por el usuario.
-            Cada propuesta debe ser conceptualmente distinta y basarse explícitamente en la Ontología Sistémico-Relacional y la Epistemología Cognosistémica de la TCCR.
             
-            DEBES incorporar los siguientes conceptos de la TCCR para justificar las metodologías:
-            1.  Cognosistema: Como suprasistema narrativo que estructura la realidad social.
-            2.  Sistemas Narrativos: Analizando su estructura (8 elementos) o Ciclo Vital (Surgimiento, Desarrollo, Madurez, Declive/Transformación, Renovación).
-            3.  Dinámica de Cambio: Utilizando los conceptos de Fricciones Narrativas, Jerarquía de Narrativas (Hegemónicas, Desafiantes, Subyugadas) y/o las Fases Beta, Alfa, Delta.
-            4.  Memes Cognosistémicos (Consolidación, Fricción, Transición) como agentes de modulación simbólica o vectores de cambio.
-            5.  Articulación Ecosistémica: Relacionando niveles micro, meso, exo, o macro.
+            Cada propuesta DEBE adherirse estrictamente al marco de las Reglas de Oro Conceptuales de la TCCR para el entrenamiento:
+            
+            *** REGLAS DE ORO CONCEPTUALES TCCR (Constricciones Innegociables) ***
+            
+            1.  **Anclaje Paradigmático y Metateórico:** Toda propuesta debe preservar la mirada cognosistémica: la realidad psicosocial es una **Construcción Narrativa Relacional** dentro de un **Cognosistema** específico, con **multinivelidad**, **jerarquías narrativas**, **poder**, **temporalidad** y **validación ética**.
+            
+            2.  **Cognosistema (Regla 1):** El análisis DEBE anclarse siempre a una **sociedad y periodo** específicos (aunque estos se infieran del tema/hipótesis). **Nunca** se debe asignar el Cognosistema a un individuo, familia u organización de forma aislada.
+            
+            3.  **Articulación Ecosistémica (Regla 9):** Las propuestas deben demostrar la **Articulación Multinivel** de forma orgánica, relacionando de manera explícita las dimensiones **Micro, Meso y Macro** del fenómeno.
+            
+            4.  **Sistema Narrativo (Regla 2):** El análisis debe abordar los **Sistemas Narrativos Cognosistémicos (SNC)** como unidades del Cognosistema, utilizando su estructura (los 8 elementos) o su **Ciclo Vital** (Surgimiento, Desarrollo, Madurez, Declive/Transformación, Renovación).
+            
+            5.  **Jerarquía y Movilidad (Regla 11):** Debe identificar y analizar las **Jerarquías de Narrativas** (**Hegemónicas, Dominantes Emergentes, Desafiantes, Subyugadas**) y considerar la **Movilidad Narrativa** (Ascendente/Descendente/Horizontal) como motor de cambio.
+            
+            6.  **Dinámica de Cambio (Regla 19):** El diseño metodológico debe estar justificado en la dinámica de cambio: **Fase Beta (Estabilidad), Fase Alfa (Crisis), o Fase Delta (Reorganización)**. El cambio se produce por **Fricciones Narrativas**.
+            
+            7.  **Agentes de Cambio (Regla 15):** Los **Memes Cognosistémicos** (Consolidación, Fricción, Transición) deben ser identificados o propuestos como **unidades de significado intencionalmente diseñadas** para modular y propagar narrativas, actuando como vectores estratégicos.
+            
+            8.  **Compromiso Ético (Regla 5):** Toda propuesta de investigación debe estar alineada con el propósito de la TCCR de promover la **Justicia Social y Estructural** y la **transformación relacional**.
+            
+            *** FIN DE LAS REGLAS DE ORO ***
 
             Las metodologías propuestas deben ser actuales y de alto nivel académico (ejemplos: Análisis de Redes Sociales (ARS), Etnografía Digital, Teoría Fundamentada, Q-Methodology, Análisis de Contenido Computacional/Minero de Texto, Estudios de Caso Múltiple Anidados).
             
@@ -177,7 +194,7 @@
                         type: "OBJECT",
                         properties: {
                             title: { type: "STRING", description: "Título de la propuesta metodológica, breve y académico." },
-                            methodology_summary: { type: "STRING", description: "Descripción de la metodología (máx. 3 oraciones) y su justificación en términos TCCR." },
+                            methodology_summary: { type: "STRING", description: "Descripción de la metodología (máx. 3 oraciones) y su justificación en términos TCCR, demostrando la aplicación de las Reglas de Oro." },
                             tools: {
                                 type: "ARRAY",
                                 description: "Herramientas de investigación empírica específicas.",
@@ -250,6 +267,11 @@
 
         // Función principal para la llamada a la API con backoff exponencial
         async function fetchProposals(topic, hypothesis) {
+            
+            // NOTA: Se ha eliminado la comprobación de API_KEY para permitir que el entorno Canvas
+            // inyecte automáticamente la clave. Si despliega esto fuera de Canvas, debe
+            // insertar manualmente su clave en la variable API_KEY.
+            
             const userQuery = `
                 Tema de Investigación: ${topic}
                 Hipótesis de Investigación: ${hypothesis}
@@ -356,7 +378,10 @@
                 renderProposals(proposals);
             } catch (error) {
                 console.error("Fallo en la generación de propuestas:", error);
-                errorMessage.textContent = `Error al generar las propuestas. Asegúrese de que su entrada sea clara y el servidor API esté disponible. Detalle: ${error.message}`;
+                
+                // Si el error es una falla de red o de la API, mostrar un mensaje genérico.
+                errorMessage.textContent = `Error al generar las propuestas. La API de Gemini no respondió correctamente. Detalle: ${error.message}`;
+                
                 errorMessage.classList.remove('hidden');
             } finally {
                 // Restaurar botón y ocultar spinner
