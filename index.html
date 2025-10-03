@@ -142,8 +142,8 @@
         // ATENCIÓN: Esta clave se completa automáticamente en el entorno de desarrollo (Canvas).
         // Si despliega esta aplicación externamente (ej: GitHub Pages), DEBE obtener y colocar
         // su propia clave Gemini API aquí para que la generación funcione.
-        const API_KEY = "AIzaSyDcSrf5qmddi3G3YdqmaQozqCzf8won3iA"; //
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
+        const ENDPOINT = "https://timely-hummingbird-fa79a0.netlify.app/.netlify/functions/gemini";
+        const APP_TOKEN = ""; // opcional: solo si activaste APP_CLIENT_TOKEN en Netlify
 
         const form = document.getElementById('research-form');
         const topicInput = document.getElementById('topic');
@@ -284,22 +284,23 @@
             `;
             
             const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] },
+                text: userQuery,
+                systemInstruction: systemPrompt,
                 generationConfig: {
                     responseMimeType: "application/json",
                     responseSchema: responseSchema
                 }
-            };
+             };
+             // payload genérico para el backend de Netlify
 
             const maxRetries = 5;
             let lastError = null;
 
             for (let attempt = 0; attempt < maxRetries; attempt++) {
                 try {
-                    const response = await fetch(API_URL, {
+                    const response = await fetch(ENDPOINT, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 'Content-Type': 'application/json', 'X-App-Key': APP_TOKEN },
                         body: JSON.stringify(payload)
                     });
 
@@ -310,13 +311,18 @@
 
                     const result = await response.json();
                     
-                    const candidate = result.candidates?.[0];
-                    if (candidate && candidate.content?.parts?.[0]?.text) {
-                        const jsonText = candidate.content.parts[0].text;
-                        const parsedJson = JSON.parse(jsonText);
-                        
+                    const text = result?.output?.text;
+                    if (text) {
+                        let parsedJson;
+                        try {
+                            parsedJson = JSON.parse(text);
+                        } catch {
+                            const m = text.match(/\{[\s\S]*\}/);
+                            if (!m) throw new Error("La respuesta no es JSON válido.");
+                            parsedJson = JSON.parse(m[0]);
+                        }
                         if (parsedJson.proposals && parsedJson.proposals.length === 3) {
-                            return parsedJson.proposals;
+                           return parsedJson.proposals;
                         } else {
                             throw new Error("Respuesta JSON incompleta o no sigue el esquema requerido (no se encontraron 3 propuestas).");
                         }
